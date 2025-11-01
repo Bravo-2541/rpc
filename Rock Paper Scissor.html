@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-blue { background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); }
+        .btn-green { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }
+        .btn-red { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
+        .btn-secondary { background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%); }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .move-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .move-btn {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1em;
+            padding: 20px;
+        }
+
+        .move-icon {
+            font-size: 3em;
+        }
+
+        .score-board {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin: 5px 0;
+        }
+
+        .score-value {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            background: #f3f4f6;
+        }
+
+        .leaderboard-item.first {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+        }
+
+        .rank {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #666;
+            margin-right: 15px;
+        }
+
+        .player-name {
+            flex: 1;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .result-box {
+            background: #dbeafe;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .result-moves {
+            display: grid;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .result-move {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .result-move-icon {
+            font-size: 2em;
+        }
+
+        .result-text {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #1e40af;
+            margin-top: 10px;
+        }
+
+        .info-text {
+            text-align: center;
+            color: #666;
+            margin: 10px 0;
+        }
+
+        .trophy {
+            text-align: center;
+            font-size: 4em;
+            margin: 20px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .players-list {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mode Selection Screen -->
+        <div id="modeScreen">
+            <h1>🎮 Rock Paper Scissors</h1>
+            <button class="btn btn-blue" onclick="selectMode('single')">🤖 Single Player vs Computer</button>
+            <button class="btn btn-green" onclick="selectMode('multi')">👥 Multiplayer (2-5 Players)</button>
+        </div>
+
+        <!-- Setup Screen -->
+        <div id="setupScreen" class="hidden">
+            <h2>Game Setup</h2>
+            
+            <div class="input-group">
+                <label>Number of Rounds</label>
+                <select id="roundsSelect">
+                    <option value="3">3 Rounds</option>
+                    <option value="4">4 Rounds</option>
+                    <option value="5" selected>5 Rounds</option>
+                    <option value="6">6 Rounds</option>
+                    <option value="7">7 Rounds</option>
+                    <option value="8">8 Rounds</option>
+                    <option value="9">9 Rounds</option>
+                    <option value="10">10 Rounds</option>
+                </select>
+            </div>
+
+            <div id="difficultyGroup" class="input-group hidden">
+                <label>Computer Difficulty</label>
+                <select id="difficultySelect">
+                    <option value="easy">Easy</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
+
+            <div id="numPlayersGroup" class="input-group hidden">
+                <label>Number of Players</label>
+                <select id="numPlayersSelect">
+                    <option value="2" selected>2 Players</option>
+                    <option value="3">3 Players</option>
+                    <option value="4">4 Players</option>
+                    <option value="5">5 Players</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label id="playerLabel">Player Name</label>
+                <input type="text" id="playerInput" placeholder="Enter name">
+            </div>
+
+            <div id="playersList" class="players-list hidden"></div>
+
+            <button class="btn" onclick="addPlayer()">Add Player</button>
+            <button class="btn btn-secondary" onclick="backToMode()">Back</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="hidden">
+            <h2 id="roundTitle">Round 1 of 5</h2>
+            <p id="currentPlayerText" class="info-text"></p>
+
+            <div class="move-buttons">
+                <button class="btn btn-blue move-btn" onclick="makeMove('rock')">
+                    <span class="move-icon">✊</span>
+                    <span>Rock</span>
+                </button>
+                <button class="btn btn-green move-btn" onclick="makeMove('paper')">
+                    <span class="move-icon">✋</span>
+                    <span>Paper</span>
+                </button>
+                <button class="btn btn-red move-btn" onclick="makeMove('scissors')">
+                    <span class="move-icon">✌️</span>
+                    <span>Scissors</span>
+                </button>
+            </div>
+
+            <div class="score-board">
+                <h3 style="margin-bottom: 10px;">Current Scores</h3>
+                <div id="scoresList"></div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="hidden">
+            <h2 id="resultsTitle">Round Results</h2>
+            
+            <div class="result-box">
+                <div class="result-moves" id="resultMoves"></div>
+                <div class="result-text" id="resultText"></div>
+            </div>
+
+            <div class="score-board">
+                <h3 style="margin-bottom: 10px;">Current Scores</h3>
+                <div id="resultsScoresList"></div>
+            </div>
+
+            <button class="btn" onclick="nextRound()">Continue</button>
+        </div>
+
+        <!-- Final Screen -->
+        <div id="finalScreen" class="hidden">
+            <div class="trophy">🏆</div>
+            <h2>Game Over!</h2>
+            
+            <div style="margin: 30px 0;">
+                <h3 style="margin-bottom: 15px; text-align: center;">Final Leaderboard</h3>
+                <div id="leaderboard"></div>
+            </div>
+
+            <button class="btn" onclick="resetGame()">🔄 Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        let gameState = {
+            mode: null,
+            players: [],
+            currentPlayer: 0,
+            totalRounds: 5,
+            currentRound: 1,
+            roundMoves: [],
+            scores: {},
+            difficulty: 'medium',
+            playerHistory: []
+        };
+
+        const AI = {
+            easy: () => ['rock', 'paper', 'scissors'][Math.floor(Math.random() * 3)],
+            medium: (history) => {
+                if (history.length < 2) return AI.easy();
+                const lastMove = history[history.length - 1];
+                const counters = { rock: 'paper', paper: 'scissors', scissors: 'rock' };
+                return Math.random() > 0.4 ? counters[lastMove] : AI.easy();
+            },
+            hard: (history) => {
+                if (history.length < 3) return AI.easy();
+                const counts = history.reduce((acc, m) => {
+                    acc[m] = (acc[m] || 0) + 1;
+                    return acc;
+                }, {});
+                const mostUsed = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+                const counters = { rock: 'paper', paper: 'scissors', scissors: 'rock' };
+                return Math.random() > 0.3 ? counters[mostUsed] : AI.easy();
+            }
+        };
+
+        function selectMode(mode) {
+            gameState.mode = mode;
+            document.getElementById('modeScreen').classList.add('hidden');
+            document.getElementById('setupScreen').classList.remove('hidden');
+            
+            if (mode === 'single') {
+                document.getElementById('difficultyGroup').classList.remove('hidden');
+                document.getElementById('numPlayersGroup').classList.add('hidden');
+                document.getElementById('playerLabel').textContent = 'Your Name';
+            } else {
+                document.getElementById('difficultyGroup').classList.add('hidden');
+                document.getElementById('numPlayersGroup').classList.remove('hidden');
+                document.getElementById('playerLabel').textContent = 'Player 1 Name';
+            }
+        }
+
+        function addPlayer() {
+            const input = document.getElementById('playerInput');
+            const name = input.value.trim();
+            
+            if (!name) {
+                alert('Please enter a name!');
+                return;
+            }
+
+            gameState.players.push(name);
+            input.value = '';
+            
+            const maxPlayers = gameState.mode === 'single' ? 1 : parseInt(document.getElementById('numPlayersSelect').value);
+            
+            if (gameState.players.length < maxPlayers) {
+                document.getElementById('playerLabel').textContent = `Player ${gameState.players.length + 1} Name`;
+                const playersList = document.getElementById('playersList');
+                playersList.classList.remove('hidden');
+                playersList.textContent = 'Players added: ' + gameState.players.join(', ');
+            } else {
+                startGame();
+            }
+        }
+
+        function startGame() {
+            gameState.totalRounds = parseInt(document.getElementById('roundsSelect').value);
+            gameState.difficulty = document.getElementById('difficultySelect').value;
+            
+            gameState.players.forEach(p => gameState.scores[p] = 0);
+            if (gameState.mode === 'single') {
+                gameState.scores['Computer'] = 0;
+            }
+            
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            
+            updateGameScreen();
+        }
+
+        function updateGameScreen() {
+            document.getElementById('roundTitle').textContent = `Round ${gameState.currentRound} of ${gameState.totalRounds}`;
+            
+            if (gameState.mode === 'multi') {
+                document.getElementById('currentPlayerText').textContent = `${gameState.players[gameState.currentPlayer]}'s Turn`;
+            } else {
+                document.getElementById('currentPlayerText').textContent = 'Choose your move!';
+            }
+            
+            updateScores('scoresList');
+        }
+
+        function makeMove(move) {
+            if (gameState.mode === 'single') {
+                gameState.playerHistory.push(move);
+                const computerMove = AI[gameState.difficulty](gameState.playerHistory);
+                gameState.roundMoves = [
+                    { player: gameState.players[0], move: move },
+                    { player: 'Computer', move: computerMove }
+                ];
+                processRound();
+            } else {
+                gameState.roundMoves.push({
+                    player: gameState.players[gameState.currentPlayer],
+                    move: move
+                });
+                
+                if (gameState.currentPlayer < gameState.players.length - 1) {
+                    gameState.currentPlayer++;
+                    updateGameScreen();
+                } else {
+                    processRound();
+                }
+            }
+        }
+
+        function determineWinner(m1, m2) {
+            if (m1 === m2) return 'tie';
+            if ((m1 === 'rock' && m2 === 'scissors') ||
+                (m1 === 'paper' && m2 === 'rock') ||
+                (m1 === 'scissors' && m2 === 'paper')) {
+                return 'win';
+            }
+            return 'lose';
+        }
+
+        function processRound() {
+            let resultText = '';
+            
+            if (gameState.mode === 'single') {
+                const result = determineWinner(gameState.roundMoves[0].move, gameState.roundMoves[1].move);
+                if (result === 'win') {
+                    gameState.scores[gameState.players[0]]++;
+                    resultText = `${gameState.players[0]} wins!`;
+                } else if (result === 'lose') {
+                    gameState.scores['Computer']++;
+                    resultText = 'Computer wins!';
+                } else {
+                    resultText = "It's a tie!";
+                }
+            } else {
+                for (let i = 0; i < gameState.roundMoves.length; i++) {
+                    for (let j = i + 1; j < gameState.roundMoves.length; j++) {
+                        const result = determineWinner(gameState.roundMoves[i].move, gameState.roundMoves[j].move);
+                        if (result === 'win') {
+                            gameState.scores[gameState.roundMoves[i].player]++;
+                        } else if (result === 'lose') {
+                            gameState.scores[gameState.roundMoves[j].player]++;
+                        }
+                    }
+                }
+                resultText = 'Points awarded!';
+            }
+            
+            showResults(resultText);
+        }
+
+        function showResults(resultText) {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+            
+            document.getElementById('resultsTitle').textContent = `Round ${gameState.currentRound} Results`;
+            
+            const movesDiv = document.getElementById('resultMoves');
+            movesDiv.innerHTML = '';
+            gameState.roundMoves.forEach(m => {
+                const moveDiv = document.createElement('div');
+                moveDiv.className = 'result-move';
+                const icon = m.move === 'rock' ? '✊' : m.move === 'paper' ? '✋' : '✌️';
+                moveDiv.innerHTML = `
+                    <span class="result-move-icon">${icon}</span>
+                    <div>
+                        <div style="font-weight: bold; font-size: 1.1em;">${m.player}</div>
+                        <div style="text-transform: capitalize; color: #666;">${m.move}</div>
+                    </div>
+                `;
+                movesDiv.appendChild(moveDiv);
+            });
+            
+            document.getElementById('resultText').textContent = resultText;
+            updateScores('resultsScoresList');
+        }
+
+        function updateScores(elementId) {
+            const scoresDiv = document.getElementById(elementId);
+            scoresDiv.innerHTML = '';
+            Object.entries(gameState.scores).forEach(([name, score]) => {
+                const scoreDiv = document.createElement('div');
+                scoreDiv.className = 'score-item';
+                scoreDiv.innerHTML = `
+                    <span>${name}</span>
+                    <span class="score-value">${score}</span>
+                `;
+                scoresDiv.appendChild(scoreDiv);
+            });
+        }
+
+        function nextRound() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                showFinalResults();
+            } else {
+                gameState.currentRound++;
+                gameState.roundMoves = [];
+                gameState.currentPlayer = 0;
+                
+                document.getElementById('resultsScreen').classList.add('hidden');
+                document.getElementById('gameScreen').classList.remove('hidden');
+                updateGameScreen();
+            }
+        }
+
+        function showFinalResults() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('finalScreen').classList.remove('hidden');
+            
+            const leaderboard = Object.entries(gameState.scores)
+                .map(([name, score]) => ({ name, score }))
+                .sort((a, b) => b.score - a.score);
+            
+            const leaderboardDiv = document.getElementById('leaderboard');
+            leaderboardDiv.innerHTML = '';
+            
+            leaderboard.forEach((entry, idx) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'leaderboard-item' + (idx === 0 ? ' first' : '');
+                itemDiv.innerHTML = `
+                    <span class="rank">#${idx + 1}</span>
+                    <span class="player-name">${entry.name}</span>
+                    <span class="score-value" style="font-size: 1.5em;">${entry.score}</span>
+                `;
+                leaderboardDiv.appendChild(itemDiv);
+            });
+        }
+
+        function backToMode() {
+            gameState.players = [];
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('modeScreen').classList.remove('hidden');
+            document.getElementById('playerInput').value = '';
+            document.getElementById('playersList').classList.add('hidden');
+        }
+
+        function resetGame() {
+            gameState = {
+                mode: null,
+                players: [],
+                currentPlayer: 0,
+                totalRounds: 5,
+                currentRound: 1,
+                roundMoves: [],
+                scores: {},
+                difficulty: 'medium',
+                playerHistory: []
+            };
+            
+            document.getElementById('finalScreen').classList.add('hidden');
+            document.getElementById('modeScreen').classList.remove('hidden');
+            document.getElementById('playerInput').value = '';
+            document.getElementById('playersList').classList.add('hidden');
+        }
+
+        // Allow Enter key to add player
+        document.getElementById('playerInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addPlayer();
+            }
+        });
+    </script>
+</body>
+</html>
